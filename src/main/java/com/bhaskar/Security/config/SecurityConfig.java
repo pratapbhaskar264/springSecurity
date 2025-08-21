@@ -23,12 +23,16 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Autowired
      private  UserDetailsService userDetailsService;
@@ -44,7 +48,8 @@ public class SecurityConfig {
 
 //        http.formLogin(Customizer.withDefaults()); //disabled so that with different session ids the form could work on browser as well video 32
         http.httpBasic(Customizer.withDefaults());//for postman to avoid html at get request
-        http.sessionManagement(session -> session.sessionCreationPolicy((SessionCreationPolicy.STATELESS))); // independent session id
+        http.sessionManagement(session -> session.sessionCreationPolicy((SessionCreationPolicy.STATELESS)))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);// independent session id
         return http.build();
     }
     @Bean
